@@ -138,12 +138,12 @@ class Demographics(models.Model):
             phone = ET.SubElement(doc, 'Telephone')
             ET.SubElement(phone, 'type').text = self.tel_1_type and str(self.tel_1_type) or ""
             ET.SubElement(phone, 'number').text = self.tel_1_number and str(self.tel_1_number) or ""
-            ET.SubElement(phone, 'preferred').text = self.tel_1_preferred_p != None and (self.tel_1_preferred_p and 'true' or ' false') or ""
+            ET.SubElement(phone, 'preferred').text = self.tel_1_preferred_p != None and (self.tel_1_preferred_p and 'true' or 'false') or ""
         if self.tel_2_number:
             phone = ET.SubElement(doc, 'Telephone')
             ET.SubElement(phone, 'type').text = self.tel_2_type and str(self.tel_2_type) or ""
             ET.SubElement(phone, 'number').text = self.tel_2_number and str(self.tel_2_number) or ""
-            ET.SubElement(phone, 'preferred').text = self.tel_2_preferred_p != None and (self.tel_2_preferred_p and 'true' or ' false') or ""
+            ET.SubElement(phone, 'preferred').text = self.tel_2_preferred_p != None and (self.tel_2_preferred_p and 'true' or 'false') or ""
         address = ET.SubElement(doc, 'Address')
         ET.SubElement(address, 'country').text = self.adr_country and str(self.adr_country) or ""
         ET.SubElement(address, 'city').text = self.adr_city and str(self.adr_city) or ""
