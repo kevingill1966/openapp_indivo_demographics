@@ -10,4 +10,5 @@ Changelog
 -----------------
 
 * Fix problems with installing from pypi.
+* Fix order of fields in the PUT document.
 
