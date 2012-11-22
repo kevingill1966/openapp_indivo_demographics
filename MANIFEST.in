@@ -1,0 +1,4 @@
+recursive-include docs  *
+recursive-include openapp_indivo/demographics/registered_apps *
+recursive-include openapp_indivo/demographics/templates *
+recursive-include openapp_indivo/demographics/static *
