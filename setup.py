@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0'
+version = '1.0.1'
 
 setup(name='openapp_indivo_demographics',
       version=version,
@@ -21,6 +21,7 @@ setup(name='openapp_indivo_demographics',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['openapp_indivo'],
       include_package_data=True,
+      package_data = {'':['README.rst']},
       zip_safe=False,
       install_requires=[
           'setuptools',

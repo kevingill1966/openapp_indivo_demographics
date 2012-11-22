@@ -4,6 +4,7 @@
 # then converts to a messaging api.
 
 import json
+import logging
 import xml.etree.ElementTree as ET
 
 from django.db import models
@@ -11,6 +12,8 @@ from django.db.models.manager import Manager
 
 from middleware import get_request
 from utils import get_indivo_client, _sessionkey
+
+logger = logging.getLogger(__name__)
 
 class DemographicsManager(Manager):
     def get(self, *args, **kwargs):
@@ -85,13 +88,13 @@ class Demographics(models.Model):
     adr_postalcode = models.CharField(max_length=200, null=True, blank=True)
     adr_region = models.CharField(max_length=200, null=True, blank=True)
     adr_country = models.CharField(max_length=200, null=True, blank=True)
-    tel_1_preferred_p = models.NullBooleanField(null=True, blank=True)
     tel_1_type = models.CharField(max_length=200, null=True, blank=True,
             choices= [('h', 'Home'), ('w', 'Work'), ('c', 'Mobile')])
     tel_1_number = models.CharField(max_length=200, null=True, blank=True)
-    tel_2_number = models.CharField(max_length=200, null=True, blank=True)
+    tel_1_preferred_p = models.NullBooleanField(null=True, blank=True)
     tel_2_type = models.CharField(max_length=200, null=True, blank=True,
             choices= [('h', 'Home'), ('w', 'Work'), ('c', 'Mobile')])
+    tel_2_number = models.CharField(max_length=200, null=True, blank=True)
     tel_2_preferred_p = models.NullBooleanField(null=True, blank=True)
 
     def __unicode__(self):
@@ -112,6 +115,7 @@ class Demographics(models.Model):
         if record_id:
             resp, content = client.set_demographics(record_id=record_id, body=d)
             if resp['status'] != '200':
+                logger.error("Error %s updating demographics from record (%s): %s\n%s"% (resp['status'], record_id, content, d.replace("><", ">\n<")))
                 raise Exception("Error %s updating demographics from record (%s): %s"% (resp['status'], record_id, content))
 
     objects = DemographicsManager()
@@ -130,23 +134,21 @@ class Demographics(models.Model):
         ET.SubElement(name, 'middleName').text = self.name_middle and str(self.name_middle) or ""
         ET.SubElement(name, 'prefix').text = self.name_prefix and str(self.name_prefix) or ""
         ET.SubElement(name, 'suffix').text = self.name_suffix and str(self.name_suffix) or ""
-        phone = ET.SubElement(doc, 'Telephone')
-        ET.SubElement(phone, 'number').text = self.tel_1_number and str(self.tel_1_number) or ""
         if self.tel_1_number:
+            phone = ET.SubElement(doc, 'Telephone')
             ET.SubElement(phone, 'type').text = self.tel_1_type and str(self.tel_1_type) or ""
+            ET.SubElement(phone, 'number').text = self.tel_1_number and str(self.tel_1_number) or ""
             ET.SubElement(phone, 'preferred').text = self.tel_1_preferred_p != None and (self.tel_1_preferred_p and 'true' or ' false') or ""
-        phone = ET.SubElement(doc, 'Telephone')
-        ET.SubElement(phone, 'number').text = self.tel_2_number and str(self.tel_2_number) or ""
         if self.tel_2_number:
+            phone = ET.SubElement(doc, 'Telephone')
             ET.SubElement(phone, 'type').text = self.tel_2_type and str(self.tel_2_type) or ""
+            ET.SubElement(phone, 'number').text = self.tel_2_number and str(self.tel_2_number) or ""
             ET.SubElement(phone, 'preferred').text = self.tel_2_preferred_p != None and (self.tel_2_preferred_p and 'true' or ' false') or ""
         address = ET.SubElement(doc, 'Address')
         ET.SubElement(address, 'country').text = self.adr_country and str(self.adr_country) or ""
         ET.SubElement(address, 'city').text = self.adr_city and str(self.adr_city) or ""
+        ET.SubElement(address, 'postalCode').text = self.adr_postalcode and str(self.adr_postalcode) or ""
         ET.SubElement(address, 'region').text = self.adr_region and str(self.adr_region) or ""
         ET.SubElement(address, 'street').text = self.adr_street and str(self.adr_street) or ""
-        if self.adr_postalcode:
-            # Won't allow nulls
-            ET.SubElement(address, 'postalCode').text = self.adr_postalcode and str(self.adr_postalcode) or ""
 
         return ET.tostring(doc, encoding='utf8')
