@@ -56,12 +56,14 @@ environment. It cannot detect it from the settings file.
 Add these two files to the indivo_server environment. 
 
 indivo_server/registered_apps/user/openapp_indivo.demographics/credentials.json::
+
     {
         "consumer_key": "demographics@apps.openapp.ie",
         "consumer_secret": "demographics"
     }
 
 indivo_server/registered_apps/user/openapp_indivo.demographics/manifest.json::
+
     {
       "name" : "Demographics",
       "description" : "View and Edit the Demographics record.",
